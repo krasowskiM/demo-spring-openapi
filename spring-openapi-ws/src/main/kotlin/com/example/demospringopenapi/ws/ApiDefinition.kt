@@ -50,5 +50,6 @@ class VehicleRepository {
 }
 
 data class Vehicle(
-        val id: String
+        val id: Int,
+        val registrationNumber: String
 )
