@@ -8,13 +8,21 @@ import org.springframework.web.bind.annotation.*
 @RestController
 @RequestMapping("/api/vehicle")
 class VehicleController(private val vehicleService: VehicleService) {
+
     @GetMapping("/{id}")
     fun getVehicle(@PathVariable id: String) = ResponseEntity.ok().body(vehicleService.getVehicleById(id))
 
-    @PostMapping
-    fun saveVehicle(@RequestBody vehicle: Vehicle): ResponseEntity<Any> {
+    @GetMapping
+    fun getAllVehicles() = vehicleService.getAll()
+
+    @PutMapping
+    fun saveVehicle(@RequestBody vehicle: Vehicle) {
         vehicleService.save(vehicle)
-        return ResponseEntity.ok().build()
+    }
+
+    @DeleteMapping("/{id}")
+    fun deleteVehicle(@PathVariable id: String) {
+        vehicleService.delete(id)
     }
 }
 
@@ -22,17 +30,23 @@ class VehicleController(private val vehicleService: VehicleService) {
 class VehicleService(private val vehicleRepository: VehicleRepository) {
 
     fun getVehicleById(id: String) = vehicleRepository.get(id)
-
     fun save(vehicle: Vehicle) = vehicleRepository.store(vehicle)
+    fun getAll(): Set<Vehicle> = vehicleRepository.getAll()
+    fun delete(id: String) {
+        vehicleRepository.delete(id)
+    }
 }
 
 @Component
 class VehicleRepository {
-    private val vehicleStorage: Map<String, Vehicle> = mutableMapOf()
+    private val vehicleStorage: MutableMap<String, Vehicle> = mutableMapOf()
 
     fun get(id: String) = vehicleStorage[id]
-
     fun store(vehicle: Vehicle) = vehicleStorage + mapOf(vehicle.id to vehicle)
+    fun getAll(): Set<Vehicle> = vehicleStorage.values.toSet()
+    fun delete(id: String) {
+        vehicleStorage.remove(id)
+    }
 }
 
 data class Vehicle(
