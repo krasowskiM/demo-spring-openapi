@@ -5,6 +5,8 @@ import org.springframework.stereotype.Component
 import org.springframework.stereotype.Service
 import org.springframework.web.bind.annotation.*
 
+private var vehicleIdCounter = 1
+
 @RestController
 @RequestMapping("/api/vehicle")
 class VehicleController(private val vehicleService: VehicleService) {
@@ -42,7 +44,10 @@ class VehicleRepository {
     private val vehicleStorage: MutableMap<Int, Vehicle> = mutableMapOf()
 
     fun get(id: Int) = vehicleStorage[id]
-    fun store(vehicle: Vehicle) = vehicleStorage + mapOf(vehicle.id to vehicle)
+    fun store(vehicle: Vehicle) {
+        vehicle.apply { id = initId() }
+        vehicleStorage[vehicle.id] = vehicle
+    }
     fun getAll(): Set<Vehicle> = vehicleStorage.values.toSet()
     fun delete(id: Int) {
         vehicleStorage.remove(id)
@@ -50,6 +55,10 @@ class VehicleRepository {
 }
 
 data class Vehicle(
-        val id: Int,
-        val registrationNumber: String
+        var id: Int,
+        val registrationNumber: String?
 )
+
+fun initId(): Int {
+    return vehicleIdCounter++
+}
