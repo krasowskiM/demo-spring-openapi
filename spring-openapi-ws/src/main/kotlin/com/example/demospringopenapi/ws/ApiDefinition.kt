@@ -1,5 +1,9 @@
 package com.example.demospringopenapi.ws
 
+import io.swagger.v3.oas.annotations.OpenAPIDefinition
+import io.swagger.v3.oas.annotations.Operation
+import io.swagger.v3.oas.annotations.info.Info
+import io.swagger.v3.oas.annotations.responses.ApiResponse
 import org.springframework.http.ResponseEntity
 import org.springframework.stereotype.Component
 import org.springframework.stereotype.Service
@@ -7,6 +11,9 @@ import org.springframework.web.bind.annotation.*
 
 private var vehicleIdCounter = 1
 
+@OpenAPIDefinition(
+    info = Info(title = "vehicle API", description = "api for vehicle data processing", version = "1")
+)
 @RestController
 @RequestMapping("/api/vehicle")
 class VehicleController(private val vehicleService: VehicleService) {
@@ -14,6 +21,13 @@ class VehicleController(private val vehicleService: VehicleService) {
     @GetMapping("/{id}")
     fun getVehicle(@PathVariable id: Int) = ResponseEntity.ok().body(vehicleService.getVehicleById(id))
 
+    @Operation(
+        description = "get all vehicles",
+        responses = [
+            ApiResponse(responseCode = "200", description = "get all vehicles when no issues ocurred"),
+            ApiResponse(responseCode = "503", description = "service unavailable when queue processing in effect")
+        ]
+    )
     @GetMapping
     fun getAllVehicles() = vehicleService.getAll()
 
@@ -48,6 +62,7 @@ class VehicleRepository {
         vehicle.apply { id = initId() }
         vehicleStorage[vehicle.id] = vehicle
     }
+
     fun getAll(): Set<Vehicle> = vehicleStorage.values.toSet()
     fun delete(id: Int) {
         vehicleStorage.remove(id)
@@ -55,8 +70,8 @@ class VehicleRepository {
 }
 
 data class Vehicle(
-        var id: Int,
-        val registrationNumber: String?
+    var id: Int,
+    val registrationNumber: String?
 )
 
 fun initId(): Int {

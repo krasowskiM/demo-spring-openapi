@@ -3,3 +3,6 @@ springdoc:
     path: /api-ui
   api-docs:
     path: /api-docs
+
+server:
+  port: 8090
