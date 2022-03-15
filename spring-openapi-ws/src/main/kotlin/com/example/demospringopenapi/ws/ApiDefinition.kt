@@ -25,12 +25,18 @@ class VehicleController(private val vehicleService: VehicleService) {
         description = "get all vehicles",
         responses = [
             ApiResponse(responseCode = "200", description = "get all vehicles when no issues ocurred"),
-            ApiResponse(responseCode = "503", description = "service unavailable when queue processing in effect")
         ]
     )
     @GetMapping
     fun getAllVehicles() = vehicleService.getAll()
 
+    @Operation(
+        description = "save a vehicle",
+        responses = [
+            ApiResponse(responseCode = "200", description = "vehicle saved successfully"),
+            ApiResponse(responseCode = "503", description = "service unavailable when queue processing in effect")
+        ]
+    )
     @PutMapping
     fun saveVehicle(@RequestBody vehicle: Vehicle) {
         vehicleService.save(vehicle)
